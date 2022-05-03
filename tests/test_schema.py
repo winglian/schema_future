@@ -13,16 +13,30 @@ def json_schema():
             str: Or(str, int)
         },
         "str_or_int": Or(str, int),
+        "str": str,
+        "int": int,
     }
 
 
 def test_optional_map_type(json_schema):
-    payload = {"optional_map": {"my_bool": True}, "str_or_int": 123}
+    payload = {"optional_map": {"my_bool": True}, "str_or_int": 123, "str": "my_str", "int": 789}
     with pytest.raises(SchemaError):
         Schema(json_schema, ignore_extra_keys=True).validate(payload)
 
 
 def test_or_type(json_schema):
-    payload = {"str_or_int": True}
+    payload = {"str_or_int": True, "str": "my_str", "int": 789}
+    with pytest.raises(SchemaError):
+        Schema(json_schema, ignore_extra_keys=True).validate(payload)
+
+
+def test_str_type(json_schema):
+    payload = {"str_or_int": True, "str": True, "int": 789}
+    with pytest.raises(SchemaError):
+        Schema(json_schema, ignore_extra_keys=True).validate(payload)
+
+
+def test_int_type(json_schema):
+    payload = {"str_or_int": True, "str": "my_str", "int": True}
     with pytest.raises(SchemaError):
         Schema(json_schema, ignore_extra_keys=True).validate(payload)
